@@ -84,15 +84,15 @@ function createApp(name, verbose, skipConflictCheck, npmDebugLevel) {
     )
 
     const baseTsconfigJson = {
-      "compilerOptions": {
-        "target": "es2016",                                  
-        "module": "commonjs",                           
-        "esModuleInterop": true,                             
-        "forceConsistentCasingInFileNames": true,            
-        "strict": true,                                      
-        "skipLibCheck": true,                                 
-        "jsx": "react",
-      }
+        "compilerOptions": {
+            "target": "es2016",
+            "module": "commonjs",
+            "esModuleInterop": true,
+            "forceConsistentCasingInFileNames": true,
+            "strict": true,
+            "skipLibCheck": true,
+            "jsx": "react",
+        }
     }
 
     fs.writeFileSync(
@@ -110,40 +110,12 @@ function install(
     const OldPwd = process.cwd();
     process.chdir(appPath);
 
-    const verbosityLevel = ('-' + npmDebugLevel) ? npmDebugLevel : ''
-
-    const logInstall = (message, deps_list, verbose) => {
-        if (verbose) {
-            console.log();
-            console.log(`${chalk.green(message)} ${chalk.cyan(deps_list.join(' '))}`);
-            console.log();
-        }
-    }
-    // Install react and react-dom
-    const dependencies = {
-        react_deps: ['react', 'react-dom'],
-        typescript_deps: ['typescript'],
-        transpiler_deps: ['@babel/core', 'babel-loader', '@babel/preset-react', '@babel/preset-env', '@babel/preset-typescript'],
-        bundler_deps: ['webpack', 'webpack-cli', 'webpack-dev-server', 'html-webpack-plugin'],
-        typedef_deps: ['@types/react', '@types/react-dom', '@types/webpack-env'],
-    }
-
-
-
-    const install_deps = (deps_list, verbose) => {
-        logInstall("Installing", deps_list, true);
-        execCommand('npm', ['install', verbosityLevel, ...deps_list], verbose ? 'inherit' : undefined)
-            .then(
-                (v) => { logInstall("Successfully installed", deps_list, true) }
-            )
-    };
-
-    for (const [k, v] of Object.entries(dependencies)) {
-        install_deps(v, verbose);
-    }
-
-    
-
+    // Install deps.
+    const deps = ['react', 'react-dom', '@babel/core', 'babel-loader', '@babel/preset-react', '@babel/preset-env', '@babel/preset-typescript', 'webpack', 'webpack-cli', 'webpack-dev-server', 'html-webpack-plugin', '@types/react', '@types/react-dom', '@types/webpack-env'];
+    console.log(`${chalk.green("Installing dependencies...")}\n${chalk.cyan(deps.join(' '))}
+    `);
+    const args = ['install', '--save', '--save-exact', '--save-dev'];
+    execCommand('npm', args.concat(deps), 'inherit');
 }
 
 
