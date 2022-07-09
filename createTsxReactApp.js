@@ -111,11 +111,17 @@ function install(
     process.chdir(appPath);
 
     // Install deps.
-    const deps = ['react', 'react-dom', '@babel/core', 'babel-loader', '@babel/preset-react', '@babel/preset-env', '@babel/preset-typescript', 'webpack', 'webpack-cli', 'webpack-dev-server', 'html-webpack-plugin', '@types/react', '@types/react-dom', '@types/webpack-env'];
-    console.log(`${chalk.green("Installing dependencies...")}\n${chalk.cyan(deps.join(' '))}
-    `);
-    const args = ['install', '--save', '--save-exact', '--save-dev'];
-    execCommand('npm', args.concat(deps), 'inherit');
+    const deps = ['react', 'react-dom'];
+    const devDeps = ['@babel/core', 'babel-loader', '@babel/preset-react', '@babel/preset-env', '@babel/preset-typescript', 'webpack', 'webpack-cli', 'webpack-dev-server', 'html-webpack-plugin', '@types/react', '@types/react-dom', '@types/webpack-env'];
+    console.log(`${chalk.green("Installing dependencies...")} ${chalk.cyan(deps.join(' '))}`);
+    const args = ['install', '--save-exact'];
+    const devArgs = ['install', '--save', '--save-exact', '--save-dev'];
+    execCommand('npm', args.concat(deps), 'inherit').then(
+        () => {
+            console.log(`${chalk.green("Installing dependencies...")} ${chalk.cyan(devDeps.join(' '))}`);
+            execCommand('npm', devArgs.concat(devDeps), 'inherit');
+        }
+    )
 }
 
 
