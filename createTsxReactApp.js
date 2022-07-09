@@ -83,9 +83,23 @@ function createApp(name, verbose, skipConflictCheck, npmDebugLevel) {
         verbose
     )
 
+    const baseTsconfigJson = {
+      "compilerOptions": {
+        "target": "es2016",                                  
+        "module": "commonjs",                           
+        "esModuleInterop": true,                             
+        "forceConsistentCasingInFileNames": true,            
+        "strict": true,                                      
+        "skipLibCheck": true,                                 
+        "jsx": "react",
+      }
+    }
 
-
-
+    fs.writeFileSync(
+        path.join(appPath, 'tsconfig.json'),
+        JSON.stringify(baseTsconfigJson, null, 2) + os.EOL
+    );
+    log(`tsconfig.json created...`, LOGGING.INFO, true);
 }
 
 function install(
@@ -111,7 +125,7 @@ function install(
         typescript_deps: ['typescript'],
         transpiler_deps: ['@babel/core', 'babel-loader', '@babel/preset-react', '@babel/preset-env', '@babel/preset-typescript'],
         bundler_deps: ['webpack', 'webpack-cli', 'webpack-dev-server', 'html-webpack-plugin'],
-        typedef_deps: ['@types/react', '@types/react-dom', '@types/webpack-env']
+        typedef_deps: ['@types/react', '@types/react-dom', '@types/webpack-env'],
     }
 
 
@@ -127,6 +141,9 @@ function install(
     for (const [k, v] of Object.entries(dependencies)) {
         install_deps(v, verbose);
     }
+
+    
+
 }
 
 
