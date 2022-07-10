@@ -67,8 +67,8 @@ function createApp(name, verbose, skipConflictCheck, npmDebugLevel) {
         "version": "0.0.1",
         "private": true,
         "scripts": {
-            "start": "webpack-dev-server --mode development --config webpack.config.js",
-            "build": "webpack --mode production --config webpack.config.js",
+            "start": "webpack-dev-server --mode development --config ./config/webpack.dev.config.js",
+            "build": "webpack --mode production --config ./config/webpack.prod.config.js",
         }
     };
 
@@ -94,13 +94,12 @@ function install_template(
     const templatePackagePath = path.join(appPath, 'node_modules', templatePackageName);
     process.chdir(appPath);
     const args = ['install', '--save-dev', templatePackageName];
-    
+
     spawn.sync('npm', args, { stdio: 'inherit' });
-    console.log(templatePackagePath);
-    if(fs.existsSync(templatePackagePath)){
-        log(`${chalk.green(`Template ${templatePackageName} installed`)}`, LOGGING.INFO, true);
+    if (fs.existsSync(templatePackagePath)) {
+        log(`${chalk.green(`Template ${chalk.cyan(templatePackageName)} installed`)}`, LOGGING.INFO, true);
         fs.copySync(path.join(templatePackagePath, 'template'), appPath);
-        log(`${chalk.green(`Template ${templatePackageName} copied into root dir`)}`, LOGGING.INFO, true);
+        log(`${chalk.green(`Template ${chalk.cyan(templatePackageName)} copied into root dir`)}`, LOGGING.INFO, true);
         // TODO: delete the template package after copying it over
     }
     process.chdir(OldPwd);
@@ -115,7 +114,20 @@ function install_deps(
 
     // Install deps.
     const deps = ['react', 'react-dom'];
-    const devDeps = ['@babel/core', 'babel-loader', '@babel/preset-react', '@babel/preset-env', '@babel/preset-typescript', 'webpack', 'webpack-cli', 'webpack-dev-server', 'html-webpack-plugin', '@types/react', '@types/react-dom', '@types/webpack-env'];
+    const devDeps = [
+        '@babel/core',
+        'babel-loader',
+        'ts-loader',
+        '@babel/preset-react',
+        '@babel/preset-env',
+        '@babel/preset-typescript',
+        'webpack',
+        'webpack-cli',
+        'webpack-dev-server',
+        'html-webpack-plugin',
+        '@types/react',
+        '@types/react-dom',
+        '@types/webpack-env',];
     console.log(`${chalk.green("Installing dependencies...")} ${chalk.cyan(deps.join(' '))}`);
     const args = ['install', '--save-exact'];
     const devArgs = ['install', '--save', '--save-exact', '--save-dev'];

@@ -20,8 +20,8 @@ module.exports = {
                         transpileOnly: false,
                         configFile: paths.devConfig.tsconfigJson,
                     },
-                    exclude: /node_modules/,
                 },
+                exclude: /node_modules/,
             },
             {
                 test: /\.css$/,
@@ -39,13 +39,11 @@ module.exports = {
     plugins: [
         new HtmlWebpackPlugin({
             template: paths.appIndexHtml,
-            filename: 'index.html',
-            inject: 'body',
         }),
     ],
     devServer: {
         static: {
-            path: paths.appStatic,
+            directory: paths.appStatic,
         },
         port: 9000,
         // historyApiFallback: true,
