@@ -14,13 +14,28 @@ module.exports = {
         rules: [
             {
                 test: /\.tsx?$/,
-                use: {
-                    loader: 'ts-loader',
-                    options: {
-                        transpileOnly: false,
-                        configFile: paths.devConfig.tsconfigJson,
+                use: [
+                    {
+                        loader: 'babel-loader',
+                        options: {
+                            presets: [
+                                ['@babel/preset-env', {
+                                    targets: {
+                                        browsers: ['last 2 versions', 'ie >= 11'],
+                                    },
+                                }],
+                                ['@babel/preset-react'],
+                            ],
+                        },
                     },
-                },
+                    {
+                        loader: 'ts-loader',
+                        options: {
+                            transpileOnly: false,
+                            configFile: paths.devConfig.tsconfigJson,
+                        },
+                    },
+                ],
                 exclude: /node_modules/,
             },
             {
