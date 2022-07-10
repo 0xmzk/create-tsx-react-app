@@ -23,7 +23,7 @@ function init() {
         .action(argName => {
             projectName = argName;
         })
-        .option('--verbose', 'print additional logs')
+        // .option('--verbose', 'print additional logs')
         .option('--skip-conflict-check', 'skip possible conflict checks (not recommended)')
         .addOption(new commander.Option('--npm-debug-level <d|dd|ddd>', 'set npm verbose level').choices(['d', 'dd', 'ddd']))
         .parse(process.argv);
@@ -55,7 +55,7 @@ function createApp(name, verbose, skipConflictCheck, npmDebugLevel) {
     const appPath = path.resolve(name);
     const appName = path.basename(appPath);
 
-
+    // TODO: move spawn calls from sync to async
 
     ensureAppName(appName);
     log("Passed name checks...", LOGGING.INFO, true);
@@ -71,41 +71,44 @@ function createApp(name, verbose, skipConflictCheck, npmDebugLevel) {
             "build": "webpack --mode production --config webpack.config.js",
         }
     };
+
     fs.writeFileSync(
         path.join(appPath, 'package.json'),
         JSON.stringify(packageJson, null, 2) + os.EOL
     );
     log(`package.json created...`, LOGGING.INFO, true);
-
-    install(
+    install_deps(
         appPath,
-        npmDebugLevel,
-        verbose
     )
-
-    const baseTsconfigJson = {
-        "compilerOptions": {
-            "target": "es2016",
-            "module": "commonjs",
-            "esModuleInterop": true,
-            "forceConsistentCasingInFileNames": true,
-            "strict": true,
-            "skipLibCheck": true,
-            "jsx": "react",
-        }
-    }
-
-    fs.writeFileSync(
-        path.join(appPath, 'tsconfig.json'),
-        JSON.stringify(baseTsconfigJson, null, 2) + os.EOL
-    );
-    log(`tsconfig.json created...`, LOGGING.INFO, true);
+    install_template(
+        appPath,
+        'tsxb-template'
+    )
 }
 
-function install(
+function install_template(
     appPath,
-    npmDebugLevel,
-    verbose
+    templatePackageName
+) {
+    const OldPwd = process.cwd();
+    const templatePackagePath = path.join(appPath, 'node_modules', templatePackageName);
+    process.chdir(appPath);
+    const args = ['install', '--save-dev', templatePackageName];
+    
+    spawn.sync('npm', args, { stdio: 'inherit' });
+    console.log(templatePackagePath);
+    if(fs.existsSync(templatePackagePath)){
+        log(`${chalk.green(`Template ${templatePackageName} installed`)}`, LOGGING.INFO, true);
+        fs.copySync(path.join(templatePackagePath, 'template'), appPath);
+        log(`${chalk.green(`Template ${templatePackageName} copied into root dir`)}`, LOGGING.INFO, true);
+        // TODO: delete the template package after copying it over
+    }
+    process.chdir(OldPwd);
+}
+
+
+function install_deps(
+    appPath,
 ) {
     const OldPwd = process.cwd();
     process.chdir(appPath);
@@ -116,12 +119,9 @@ function install(
     console.log(`${chalk.green("Installing dependencies...")} ${chalk.cyan(deps.join(' '))}`);
     const args = ['install', '--save-exact'];
     const devArgs = ['install', '--save', '--save-exact', '--save-dev'];
-    execCommand('npm', args.concat(deps), 'inherit').then(
-        () => {
-            console.log(`${chalk.green("Installing dependencies...")} ${chalk.cyan(devDeps.join(' '))}`);
-            execCommand('npm', devArgs.concat(devDeps), 'inherit');
-        }
-    )
+    spawn.sync('npm', args.concat(deps), { stdio: 'inherit' });
+    console.log(`${chalk.green("Installing dev dependencies...")} ${chalk.cyan(devDeps.join(' '))}`);
+    spawn.sync('npm', devArgs.concat(devDeps), { stdio: 'inherit' });
 }
 
 
