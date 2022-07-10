@@ -7,7 +7,7 @@ const createPath = (relativePath) => {
 
 module.exports = {
     appEntry: createPath('./src/index.tsx'),
-    appIndexHtml: createPath('./src/index.html'),
+    appIndexHtml: createPath('./public/index.html'),
     appStatic: createPath('./public/'),
     appBuild: createPath('./build/'),
     devConfig: {
